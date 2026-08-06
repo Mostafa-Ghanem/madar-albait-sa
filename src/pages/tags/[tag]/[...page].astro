@@ -11,9 +11,10 @@ export const getStaticPaths = (async ({ paginate }) => {
 }) satisfies GetStaticPaths;
 type Props=InferGetStaticPropsType<typeof getStaticPaths>;
 const { page }=Astro.props as Props; const { tag }=Astro.params;
+const pageSuffix=page.currentPage > 1 ? ` — الصفحة ${page.currentPage}` : "";
 const paginationProps={...(page.url.prev&&{prevUrl:{text:"→ الصفحة السابقة",url:page.url.prev}}),...(page.url.next&&{nextUrl:{text:"الصفحة التالية ←",url:page.url.next}})};
 ---
-<BaseLayout meta={{title:`موضوعات ${tag}`,description:`أدلة مرتبطة بوسم ${tag} في مدار البيت.`,noindex:true}}>
-  <header class="page-hero"><span class="eyebrow">وسم تنظيمي</span><h1>#{tag}</h1><p>المقالات المرتبطة بهذا الموضوع.</p></header>
+<BaseLayout meta={{title:`موضوعات ${tag}${pageSuffix}`,description:`أدلة مرتبطة بوسم ${tag} في مدار البيت${page.currentPage > 1 ? ` — صفحة ${page.currentPage}` : ""}.`,noindex:true}}>
+  <header class="page-hero"><span class="eyebrow">وسم تنظيمي</span><h1>#{tag}{page.currentPage > 1 && ` — الصفحة ${page.currentPage}`}</h1><p>المقالات المرتبطة بهذا الموضوع.</p></header>
   <div class="post-grid">{page.data.map(p => <PostPreview post={p} />)}</div><Pagination {...paginationProps}/>
 </BaseLayout>

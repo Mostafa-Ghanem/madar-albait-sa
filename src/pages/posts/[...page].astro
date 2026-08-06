@@ -9,9 +9,10 @@ import { collectionDateSort } from "@/utils/date";
 export const getStaticPaths = (async ({ paginate }) => paginate((await getAllPosts()).sort(collectionDateSort), { pageSize: 12 })) satisfies GetStaticPaths;
 interface Props { page: Page<CollectionEntry<"post">> }
 const { page } = Astro.props;
+const pageSuffix = page.currentPage > 1 ? ` — الصفحة ${page.currentPage}` : "";
 const paginationProps = { ...(page.url.prev && { prevUrl:{ text:"→ الصفحة السابقة", url:page.url.prev } }), ...(page.url.next && { nextUrl:{ text:"الصفحة التالية ←", url:page.url.next } }) };
 ---
-<BaseLayout meta={{ title:"كل الأدلة", description:"جميع أدلة مدار البيت للأقمار والقنوات وأجهزة الاستقبال والمشاهدة الذكية داخل السعودية." }}>
-  <header class="page-hero"><span class="eyebrow">مكتبة المحتوى</span><h1>كل الأدلة</h1><p>محتوى منظم حسب النية والمشكلة، مع توضيح تاريخ التحديث والتحقق.</p></header>
+<BaseLayout meta={{ title:`كل الأدلة${pageSuffix}`, description:`جميع أدلة مدار البيت للأقمار والقنوات وأجهزة الاستقبال والمشاهدة الذكية داخل السعودية${page.currentPage > 1 ? ` — صفحة ${page.currentPage}` : ""}.` }}>
+  <header class="page-hero"><span class="eyebrow">مكتبة المحتوى</span><h1>كل الأدلة{page.currentPage > 1 && ` — الصفحة ${page.currentPage}`}</h1><p>محتوى منظم حسب النية والمشكلة، مع توضيح تاريخ التحديث والتحقق.</p></header>
   <div class="post-grid">{page.data.map(p => <PostPreview post={p} />)}</div><Pagination {...paginationProps} />
 </BaseLayout>
