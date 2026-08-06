@@ -26,36 +26,51 @@ content:
         type: select
         options:
           values:
-            - { value: satellites, label: الأقمار والاستقبال }
-            - { value: channels, label: القنوات والترددات }
-            - { value: receivers, label: أجهزة الاستقبال }
-            - { value: streaming, label: المشاهدة الذكية }
+            - { name: satellites, label: الأقمار والاستقبال }
+            - { name: channels, label: القنوات والترددات }
+            - { name: receivers, label: أجهزة الاستقبال }
+            - { name: streaming, label: المشاهدة الذكية }
       - { name: tags, label: الوسوم, type: string, list: true }
       - name: authorSlug
         label: الكاتب
         type: select
         options:
           values:
-            - { value: mostafa-ghanem, label: مصطفى غانم }
-            - { value: gamal-abdelaziz, label: جمال عبد العزيز }
+            - { name: mostafa-ghanem, label: مصطفى غانم }
+            - { name: gamal-abdelaziz, label: جمال عبد العزيز }
       - name: reviewerSlug
         label: المراجع
         type: select
         options:
           values:
-            - { value: mostafa-ghanem, label: مصطفى غانم }
-            - { value: gamal-abdelaziz, label: جمال عبد العزيز }
-      - { name: publishDate, label: تاريخ النشر, type: date, required: true }
-      - { name: updatedDate, label: تاريخ التحديث, type: date }
-      - { name: lastVerifiedDate, label: آخر تحقق عملي, type: date }
+            - { name: mostafa-ghanem, label: مصطفى غانم }
+            - { name: gamal-abdelaziz, label: جمال عبد العزيز }
+      - name: publishDate
+        label: تاريخ النشر
+        type: date
+        required: true
+        options:
+          format: yyyy-MM-dd
+      - name: updatedDate
+        label: تاريخ التحديث
+        type: date
+        default: ""
+        options:
+          format: yyyy-MM-dd
+      - name: lastVerifiedDate
+        label: آخر تحقق عملي
+        type: date
+        default: ""
+        options:
+          format: yyyy-MM-dd
       - name: verificationStatus
         label: حالة التحقق
         type: select
         options:
           values:
-            - { value: verified, label: تم التحقق }
-            - { value: evergreen, label: محتوى إرشادي ثابت }
-            - { value: pending, label: بانتظار تحقق ميداني }
+            - { name: verified, label: تم التحقق }
+            - { name: evergreen, label: محتوى إرشادي ثابت }
+            - { name: pending, label: بانتظار تحقق ميداني }
       - { name: featured, label: مميز في الرئيسية, type: boolean, default: false }
       - { name: pinned, label: مثبت, type: boolean, default: false }
       - { name: affiliate, label: يتضمن أفلييت, type: boolean, default: false }
@@ -67,8 +82,21 @@ content:
         fields:
           - { name: title, label: اسم المصدر, type: string }
           - { name: url, label: رابط المصدر, type: string }
-      - { name: body, label: نص المقال, type: rich-text }
+      - name: body
+        label: نص المقال
+        type: rich-text
+        options:
+          format: markdown
+          media: false
+          switcher: true
 
 settings:
   content:
-    merge: direct
+    merge: true
+  commit:
+    identity: user
+    templates:
+      create: "content(create): {path}"
+      update: "content(update): {path}"
+      delete: "content(delete): {path}"
+      rename: "content(rename): {oldPath} -> {newPath}"
