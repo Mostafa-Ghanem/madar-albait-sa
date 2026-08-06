@@ -1,0 +1,13 @@
+---
+import type { GetStaticPaths } from "astro";
+import { getAllPosts } from "@/data/post";
+import PostPreview from "@/components/blog/PostPreview.astro";
+import BaseLayout from "@/layouts/Base.astro";
+import { categoryMeta } from "@/site.config";
+import { collectionDateSort } from "@/utils/date";
+export const getStaticPaths = (() => Object.keys(categoryMeta).map(category => ({params:{category}}))) satisfies GetStaticPaths;
+const { category } = Astro.params;
+const meta = categoryMeta[category!];
+const posts = (await getAllPosts()).filter(p => p.data.category === category).sort(collectionDateSort);
+---
+<BaseLayout meta={{title:meta.title,description:meta.description}}><header class="page-hero"><span class="category-symbol">{meta.icon}</span><h1>{meta.title}</h1><p>{meta.description}</p></header><div class="post-grid">{posts.map(p => <PostPreview post={p} />)}</div></BaseLayout>

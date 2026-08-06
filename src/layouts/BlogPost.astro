@@ -1,80 +1,42 @@
 ---
 import { type CollectionEntry, render } from "astro:content";
-
 import Masthead from "@/components/blog/Masthead.astro";
 import TOC from "@/components/blog/TOC.astro";
-import WebMentions from "@/components/blog/webmentions/index.astro";
-
 import BaseLayout from "./Base.astro";
-
-interface Props {
-	post: CollectionEntry<"post">;
-}
-
+import { getAuthor } from "@/data/authors";
+import { siteConfig, categoryMeta } from "@/site.config";
+interface Props { post: CollectionEntry<"post"> }
 const { post } = Astro.props;
-const { ogImage, title, description, updatedDate, publishDate } = post.data;
-const socialImage = ogImage ?? `/og-image/${post.id}.png`;
-const articleDate = updatedDate?.toISOString() ?? publishDate.toISOString();
-const { headings, remarkPluginFrontmatter } = await render(post);
-const readingTime: string = remarkPluginFrontmatter.readingTime;
+const { data } = post;
+const { headings } = await render(post);
+const wordCount = (post.body ?? "").trim().split(/\s+/).filter(Boolean).length;
+const readingTime = `${Math.max(1, Math.ceil(wordCount / 180))} دقائق قراءة`;
+const author = getAuthor(data.authorSlug);
+const articleDate = (data.updatedDate ?? data.publishDate).toISOString();
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: data.title,
+  description: data.description,
+  datePublished: data.publishDate.toISOString(),
+  dateModified: (data.updatedDate ?? data.publishDate).toISOString(),
+  inLanguage: "ar-SA",
+  mainEntityOfPage: new URL(`/posts/${post.id}/`, siteConfig.url).href,
+  author: { "@type": "Person", name: author.name, url: new URL(`/authors/${data.authorSlug}/`, siteConfig.url).href },
+  publisher: { "@type": "Organization", name: siteConfig.title, url: siteConfig.url },
+  articleSection: categoryMeta[data.category]?.title,
+};
 ---
-
-<BaseLayout
-	meta={{
-		articleDate,
-		description,
-		ogImage: socialImage,
-		title,
-	}}
->
-	<article class="grow break-words" data-pagefind-body>
-		<div id="blog-hero" class="mb-12"><Masthead content={post} readingTime={readingTime} /></div>
-		<div class="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between">
-			{!!headings.length && <TOC headings={headings} />}
-			<div
-				class="prose prose-sm prose-headings:font-semibold prose-headings:text-accent-2 prose-headings:before:absolute prose-headings:before:-ms-4 prose-headings:before:text-muted prose-headings:hover:before:text-accent sm:prose-headings:before:content-['#'] sm:prose-th:before:content-none"
-			>
-				<slot />
-				<WebMentions />
-			</div>
-		</div>
-	</article>
-	<button
-		class="hover:border-link fixed end-4 bottom-8 z-90 flex h-10 w-10 translate-y-28 cursor-pointer items-center justify-center rounded-full border-2 border-transparent bg-zinc-200 text-3xl opacity-0 transition-all transition-discrete duration-300 data-[show=true]:translate-y-0 data-[show=true]:opacity-100 sm:end-8 sm:h-12 sm:w-12 dark:bg-zinc-700"
-		data-show="false"
-		id="to-top-btn"
-	>
-		<span class="sr-only">Back to top</span>
-		<svg
-			aria-hidden="true"
-			class="h-6 w-6"
-			fill="none"
-			focusable="false"
-			stroke="currentColor"
-			stroke-width="2"
-			viewBox="0 0 24 24"
-			xmlns="http://www.w3.org/2000/svg"
-		>
-			<path d="M4.5 15.75l7.5-7.5 7.5 7.5" stroke-linecap="round" stroke-linejoin="round"></path>
-		</svg>
-	</button>
+<BaseLayout meta={{ title: data.title, description: data.description, articleDate, ogImage: data.ogImage }}>
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+  <article class="article-shell" data-pagefind-body>
+    <Masthead content={post} readingTime={readingTime} />
+    <div class="article-grid">
+      {!!headings.length && <TOC headings={headings} />}
+      <div class="article-content prose"><slot />
+        {data.sources.length > 0 && <section class="sources-box"><h2>المصادر والمراجع</h2><ol>{data.sources.map((s) => <li><a href={s.url} rel="nofollow noreferrer" target="_blank">{s.title}</a></li>)}</ol></section>}
+        <section class="correction-box"><h2>وجدت معلومة تحتاج تحديثًا؟</h2><p>أرسل لنا رابط الصفحة والمعلومة الصحيحة مع مصدرها، وسيتم توثيق المراجعة في سجل التصحيحات.</p><a class="button secondary" href="/contact/">إبلاغ فريق التحرير</a></section>
+      </div>
+    </div>
+  </article>
 </BaseLayout>
-
-<script>
-	const scrollBtn = document.getElementById("to-top-btn") as HTMLButtonElement;
-	const targetHeader = document.getElementById("blog-hero") as HTMLDivElement;
-
-	function callback(entries: IntersectionObserverEntry[]) {
-		entries.forEach((entry) => {
-			// only show the scroll to top button when the heading is out of view
-			scrollBtn.dataset.show = (!entry.isIntersecting).toString();
-		});
-	}
-
-	scrollBtn.addEventListener("click", () => {
-		document.documentElement.scrollTo({ behavior: "smooth", top: 0 });
-	});
-
-	const observer = new IntersectionObserver(callback);
-	observer.observe(targetHeader);
-</script>

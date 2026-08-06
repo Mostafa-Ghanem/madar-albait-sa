@@ -1,19 +1,3 @@
----
-import "@/styles/blocks/search.css";
----
-
-<script>
-	(() => {
-		if (import.meta.env.DEV) return;
-		const onIdle = window.requestIdleCallback || ((cb) => setTimeout(cb, 1));
-		onIdle(async () => {
-			await import("@pagefind/component-ui");
-		});
-	})();
-</script>
-
-<pagefind-config
-	baseUrl={`${import.meta.env.BASE_URL}`}
-	bundle-path={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/pagefind/`}></pagefind-config>
-<pagefind-modal-trigger id="search" class="ms-auto" hide-shortcut compact></pagefind-modal-trigger>
-<pagefind-modal></pagefind-modal>
+<a class="search-button" href="/search/" aria-label="البحث في الموقع" title="البحث">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+</a>

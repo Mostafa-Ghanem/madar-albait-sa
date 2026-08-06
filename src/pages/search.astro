@@ -1,0 +1,8 @@
+---
+import BaseLayout from "@/layouts/Base.astro";
+---
+<BaseLayout meta={{title:"البحث",description:"ابحث داخل أدلة مدار البيت.",noindex:true}}><header class="page-hero"><h1>البحث</h1><p>اكتب اسم القمر أو الجهاز أو المشكلة.</p></header><div id="pagefind-search" class="search-page"></div></BaseLayout>
+<script>
+  import { PagefindUI } from '@pagefind/default-ui';
+  new PagefindUI({ element:'#pagefind-search', showSubResults:true, resetStyles:false, translations:{placeholder:'ابحث في الأدلة…',clear_search:'مسح',load_more:'عرض المزيد',search_label:'البحث',filters_label:'التصنيفات',zero_results:'لا توجد نتائج لـ [SEARCH_TERM]'} });
+</script>

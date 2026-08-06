@@ -1,0 +1,12 @@
+---
+import type { GetStaticPaths } from "astro";
+import { authors } from "@/data/authors";
+import { getAllPosts } from "@/data/post";
+import PostPreview from "@/components/blog/PostPreview.astro";
+import BaseLayout from "@/layouts/Base.astro";
+export const getStaticPaths = (() => Object.entries(authors).map(([slug,author]) => ({params:{slug},props:{author}}))) satisfies GetStaticPaths;
+const { author } = Astro.props;
+const { slug } = Astro.params;
+const posts = (await getAllPosts()).filter(p => p.data.authorSlug === slug || p.data.reviewerSlug === slug);
+---
+<BaseLayout meta={{title:author.name,description:author.bio}}><header class="author-hero"><span>{author.initials}</span><div><p class="eyebrow">فريق التحرير</p><h1>{author.name}</h1><h2>{author.role}</h2><p>{author.bio}</p></div></header><section class="section-block"><h2>المحتوى الذي شارك فيه</h2><div class="post-grid">{posts.map(p => <PostPreview post={p} />)}</div></section></BaseLayout>

@@ -1,84 +1,23 @@
 ---
-import { type CollectionEntry, getCollection } from "astro:content";
-import PostPreview from "@/components/blog/PostPreview.astro";
-import Note from "@/components/note/Note.astro";
-import SocialList from "@/components/SocialList.astro";
 import { getAllPosts } from "@/data/post";
-import PageLayout from "@/layouts/Base.astro";
+import PostPreview from "@/components/blog/PostPreview.astro";
+import BaseLayout from "@/layouts/Base.astro";
+import { categoryMeta, siteConfig } from "@/site.config";
 import { collectionDateSort } from "@/utils/date";
-
-// Posts
-const MAX_POSTS = 10;
-const allPosts = await getAllPosts();
-const allPostsByDate = allPosts.sort(collectionDateSort) as CollectionEntry<"post">[];
-const latestPosts = allPostsByDate.slice(0, MAX_POSTS);
-
-// Pinned Posts, set to a max of 3;
-const MAX_PINNED_POSTS = 3;
-const pinnedPosts = allPostsByDate
-	.values()
-	.filter((p) => p.data.pinned)
-	.take(MAX_PINNED_POSTS)
-	.toArray();
-
-// Notes, set to a max of 5
-const MAX_NOTES = 5;
-const allNotes = await getCollection("note");
-const latestNotes = allNotes
-	.sort(collectionDateSort)
-	.slice(0, MAX_NOTES) as CollectionEntry<"note">[];
+const posts = (await getAllPosts()).sort(collectionDateSort);
+const featured = posts.filter(p => p.data.featured).slice(0, 3);
+const latest = posts.slice(0, 6);
+const websiteSchema = { "@context":"https://schema.org", "@type":"WebSite", name:siteConfig.title, url:siteConfig.url, inLanguage:"ar-SA", potentialAction:{"@type":"SearchAction",target:`${siteConfig.url}search/?q={search_term_string}`,"query-input":"required name=search_term_string"} };
 ---
-
-<PageLayout meta={{ title: "Home" }}>
-	<section>
-		<h1 class="title mb-12">Hello World!</h1>
-		<p class="mb-4">
-			Hi, I’m a theme for Astro, a simple starter that you can use to create your website or blog.
-			If you want to know more about how you can customise me, add more posts, and make it your own,
-			click on the GitHub icon link below and it will take you to my repo.
-		</p>
-		<SocialList />
-	</section>
-	{
-		pinnedPosts.length > 0 && (
-			<section class="mt-16">
-				<h2 class="title mb-6 text-xl">Pinned Posts</h2>
-				<ul class="space-y-4" role="list">
-					{pinnedPosts.map((p) => (
-						<li class="grid gap-1 sm:grid-cols-[auto_1fr]">
-							<PostPreview post={p} />
-						</li>
-					))}
-				</ul>
-			</section>
-		)
-	}
-	<section class="mt-16">
-		<h2 class="title text-accent mb-6 text-xl"><a href="/posts/">Posts</a></h2>
-		<ul class="space-y-4" role="list">
-			{
-				latestPosts.map((p) => (
-					<li class="grid gap-1 sm:grid-cols-[auto_1fr]">
-						<PostPreview post={p} />
-					</li>
-				))
-			}
-		</ul>
-	</section>
-	{
-		latestNotes.length > 0 && (
-			<section class="mt-16">
-				<h2 class="title text-accent mb-6 text-xl">
-					<a href="/notes/">Notes</a>
-				</h2>
-				<ul class="space-y-6" role="list">
-					{latestNotes.map((note) => (
-						<li>
-							<Note note={note} as="h3" isPreview />
-						</li>
-					))}
-				</ul>
-			</section>
-		)
-	}
-</PageLayout>
+<BaseLayout meta={{ title: siteConfig.title, description: siteConfig.description }}>
+  <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
+  <section class="hero-section">
+    <div class="hero-copy"><span class="eyebrow">محتوى سعودي موثق وقابل للتحديث</span><h1>كل ما يحتاجه بيتك لفهم البث الفضائي والمشاهدة الذكية</h1><p>أدلة عملية للأقمار والقنوات وأجهزة الاستقبال والشاشات، بمصادر رسمية وتاريخ تحقق واضح بدل عناوين «شغال 100%» غير الموثقة.</p><div class="hero-actions"><a class="button" href="/posts/">ابدأ من الأدلة</a><a class="button secondary" href="/methodology/">كيف نتحقق؟</a></div><div class="trust-row"><span>✓ مصادر رسمية</span><span>✓ مراجعة بشرية</span><span>✓ تصميم سريع للموبايل</span></div></div>
+    <div class="hero-visual" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="home-icon">⌂</div><span class="sat-dot dot-1"></span><span class="sat-dot dot-2"></span><span class="signal signal-1"></span><span class="signal signal-2"></span></div>
+  </section>
+  <section class="section-block"><div class="section-heading"><div><span class="eyebrow">اختر مسارك</span><h2>أربعة محاور، تخصص واحد</h2></div><p>بنية واضحة تمنع تشتت المحتوى وتربط كل دليل بموضوعه الرئيسي.</p></div><div class="category-grid">{Object.entries(categoryMeta).map(([slug,c]) => <a class="category-card" href={`/categories/${slug}/`}><span>{c.icon}</span><h3>{c.title}</h3><p>{c.description}</p><b>استعرض الأدلة ←</b></a>)}</div></section>
+  {featured.length > 0 && <section class="section-block alt"><div class="section-heading"><div><span class="eyebrow">ابدأ بهذه الأدلة</span><h2>المحتوى الأساسي</h2></div></div><div class="post-grid">{featured.map(p => <PostPreview post={p} />)}</div></section>}
+  <section class="section-block"><div class="section-heading"><div><span class="eyebrow">آخر ما نُشر</span><h2>أدلة وحلول حديثة</h2></div><a href="/posts/">عرض الكل</a></div><div class="post-grid">{latest.map(p => <PostPreview post={p} />)}</div></section>
+  <section class="verification-section"><div><span class="eyebrow light">منهجية مدار البيت</span><h2>لا ننشر رقمًا متغيرًا بلا مصدر أو تاريخ تحقق</h2><p>الترددات والقنوات تتغير. لذلك نفصل بين المصدر الرسمي، الاختبار العملي، وتاريخ آخر مراجعة، ونوضح للقارئ حالة كل دليل.</p></div><div class="status-stack"><span class="status verified">✓ تم التحقق</span><span class="status evergreen">● محتوى ثابت</span><span class="status pending">◷ بانتظار الاختبار</span></div></section>
+  <section class="team-section"><div><span class="eyebrow">الفريق</span><h2>تحرير ومراجعة باسم واضح</h2></div><div class="team-grid"><a href="/authors/mostafa-ghanem/"><span>مغ</span><div><h3>مصطفى غانم</h3><p>رئيس التحرير وتطوير المنتج</p></div></a><a href="/authors/gamal-abdelaziz/"><span>جع</span><div><h3>جمال عبد العزيز</h3><p>مراجع تقني للأقمار والاستقبال</p></div></a></div></section>
+</BaseLayout>

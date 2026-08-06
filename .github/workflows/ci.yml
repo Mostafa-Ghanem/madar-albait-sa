@@ -1,8 +1,8 @@
-name: ci
+name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   pull_request:
     branches: [main]
 
@@ -10,33 +10,19 @@ permissions:
   contents: read
 
 jobs:
-  lint:
-    name: Check for build and type issues
+  validate:
+    name: Astro check and build
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-          run_install: false
-
-      - name: Setup node
-        uses: actions/setup-node@v6
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: "pnpm"
-
       - name: Install dependencies
-        run: pnpm install
-
-        # use astro check for issues
-      - name: Run Astro check
-        run: pnpm astro check
-
-        # ensure build works
-      - name: Run Astro build
-        run: pnpm build
+        run: npm install --no-audit --no-fund
+      - name: Type check
+        run: npm run check
+      - name: Production build
+        run: npm run build

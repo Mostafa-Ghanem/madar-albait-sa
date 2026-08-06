@@ -1,0 +1,5 @@
+---
+import BaseLayout from "@/layouts/Base.astro";
+import { categoryMeta } from "@/site.config";
+---
+<BaseLayout meta={{title:"الأقسام",description:"أقسام مدار البيت المتخصصة في البث المنزلي داخل السعودية."}}><header class="page-hero"><h1>الأقسام</h1><p>أربعة محاور متكاملة لتسهيل الوصول إلى المعلومة الصحيحة.</p></header><div class="category-grid">{Object.entries(categoryMeta).map(([slug,c]) => <a class="category-card" href={`/categories/${slug}/`}><span>{c.icon}</span><h2>{c.title}</h2><p>{c.description}</p></a>)}</div></BaseLayout>

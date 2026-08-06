@@ -1,23 +1,16 @@
 ---
-import { menuLinks, siteConfig } from "@/site.config";
-
 const year = new Date().getFullYear();
 ---
-
-<footer
-	class="text-muted mt-auto flex w-full flex-col items-center justify-center gap-y-2 pt-20 pb-4 text-center align-top font-semibold sm:flex-row sm:justify-between sm:text-xs"
->
-	<div class="me-0 sm:me-4">
-		&copy; {siteConfig.author}
-		{year}.<span class="inline-block">&nbsp;🚀&nbsp;{siteConfig.title}&nbsp;🌵&nbsp;</span>
-	</div>
-	<nav aria-label="Footer" class="sm:divide-muted flex gap-x-2 sm:gap-x-0 sm:divide-x">
-		{
-			menuLinks.map((link) => (
-				<a class="hover:text-global-text px-4 py-2 hover:underline sm:py-0" href={link.path}>
-					{link.title}
-				</a>
-			))
-		}
-	</nav>
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div>
+      <a class="footer-brand" href="/">مدار البيت</a>
+      <p>دليل مستقل يشرح البث الفضائي والمنزلي للمستخدم السعودي بلغة واضحة ومصادر قابلة للتحقق.</p>
+      <p class="muted">مشروع تحريري من فريق حكايات خلال مرحلة الإطلاق.</p>
+    </div>
+    <div><h2>المحتوى</h2><a href="/categories/satellites/">الأقمار</a><a href="/categories/channels/">القنوات</a><a href="/categories/receivers/">أجهزة الاستقبال</a><a href="/categories/streaming/">المشاهدة الذكية</a></div>
+    <div><h2>الثقة</h2><a href="/about/">من نحن</a><a href="/methodology/">منهجية التحقق</a><a href="/editorial-policy/">السياسة التحريرية</a><a href="/corrections/">سياسة التصحيح</a><a href="/affiliate-disclosure/">إفصاح الأفلييت</a></div>
+    <div><h2>الفريق</h2><a href="/authors/mostafa-ghanem/">مصطفى غانم</a><a href="/authors/gamal-abdelaziz/">جمال عبد العزيز</a><a href="/contact/">تواصل معنا</a><a href="/rss.xml">RSS</a></div>
+  </div>
+  <div class="footer-bottom"><span>© {year} مدار البيت</span><span>المعلومات المتغيرة تُراجع قبل الاعتماد عليها.</span></div>
 </footer>

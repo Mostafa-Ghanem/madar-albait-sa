@@ -1,29 +1,9 @@
 ---
 import type { PaginationLink } from "@/types";
-
-interface Props {
-	nextUrl?: PaginationLink;
-	prevUrl?: PaginationLink;
-}
-
+interface Props { nextUrl?: PaginationLink; prevUrl?: PaginationLink }
 const { nextUrl, prevUrl } = Astro.props;
 ---
-
-{
-	(prevUrl || nextUrl) && (
-		<nav class="mt-8 flex items-center gap-x-4">
-			{prevUrl && (
-				<a class="hover:text-accent me-auto py-2" href={prevUrl.url}>
-					{prevUrl.srLabel && <span class="sr-only">{prevUrl.srLabel}</span>}
-					{prevUrl.text ? prevUrl.text : "Previous"}
-				</a>
-			)}
-			{nextUrl && (
-				<a class="hover:text-accent ms-auto py-2" href={nextUrl.url}>
-					{nextUrl.srLabel && <span class="sr-only">{nextUrl.srLabel}</span>}
-					{nextUrl.text ? nextUrl.text : "Next"}
-				</a>
-			)}
-		</nav>
-	)
-}
+{(prevUrl || nextUrl) && <nav class="pagination" aria-label="التنقل بين الصفحات">
+  {prevUrl && <a href={prevUrl.url}>{prevUrl.srLabel && <span class="sr-only">{prevUrl.srLabel}</span>}{prevUrl.text || "→ الصفحة السابقة"}</a>}
+  {nextUrl && <a href={nextUrl.url}>{nextUrl.srLabel && <span class="sr-only">{nextUrl.srLabel}</span>}{nextUrl.text || "الصفحة التالية ←"}</a>}
+</nav>}
