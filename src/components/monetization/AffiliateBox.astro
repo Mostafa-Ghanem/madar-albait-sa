@@ -1,0 +1,38 @@
+---
+interface Product { name: string; note?: string | undefined; url: string; store: "amazon" | "noon" | "jarir" | "extra" | "other" }
+interface Props { products: Product[]; articleSlug: string }
+const { products, articleSlug } = Astro.props;
+const storeLabel: Record<Product["store"], string> = {
+  amazon: "أمازون السعودية",
+  noon: "نون",
+  jarir: "جرير",
+  extra: "إكسترا",
+  other: "المتجر",
+};
+---
+{products.length > 0 && (
+  <aside class="affiliate-box" aria-labelledby="affiliate-title">
+    <h2 id="affiliate-title">أدوات قد تحتاجها</h2>
+    <ul>
+      {products.map((p) => (
+        <li>
+          <div>
+            <strong>{p.name}</strong>
+            {p.note && <p>{p.note}</p>}
+          </div>
+          <a
+            class="button secondary"
+            href={p.url}
+            target="_blank"
+            rel="sponsored nofollow noopener"
+            data-track="affiliate_click"
+            data-store={p.store}
+            data-product={p.name}
+            data-slug={articleSlug}
+          >تحقق من السعر في {storeLabel[p.store]}</a>
+        </li>
+      ))}
+    </ul>
+    <p class="affiliate-note">قد نحصل على عمولة عند الشراء دون أي تكلفة إضافية عليك. <a href="/affiliate-disclosure/">سياسة الإفصاح</a></p>
+  </aside>
+)}

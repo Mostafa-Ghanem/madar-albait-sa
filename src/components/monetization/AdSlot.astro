@@ -1,0 +1,13 @@
+---
+import { monetization } from "@/site.config";
+interface Props { slot: string }
+const { slot } = Astro.props;
+const enabled = monetization.adsenseEnabled && monetization.adsenseClient && slot;
+---
+{enabled && (
+  <div class="ad-slot" aria-label="إعلان">
+    <span class="ad-label">إعلان</span>
+    <ins class="adsbygoogle" style="display:block" data-ad-client={monetization.adsenseClient} data-ad-slot={slot} data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script is:inline>(window.adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+)}

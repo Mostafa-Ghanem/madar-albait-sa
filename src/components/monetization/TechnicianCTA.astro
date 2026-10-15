@@ -1,0 +1,74 @@
+---
+import { cityMeta, monetization } from "@/site.config";
+interface Props { articleTitle: string; articleSlug: string; category: string; city?: string | undefined }
+const { articleTitle, articleSlug, category, city } = Astro.props;
+const number = monetization.whatsappNumber;
+---
+{number && (
+  <section class="lead-box" aria-labelledby="lead-title">
+    <h2 id="lead-title">المشكلة ما زالت قائمة؟ نوصلك بفني قريب منك</h2>
+    <p>اكتب بياناتك وسنحوّلك إلى واتساب برسالة جاهزة، ونرشّح لك فني دش قريبًا من حيّك يتواصل معك في اليوم نفسه قدر الإمكان.</p>
+    <form
+      class="lead-form"
+      data-lead-form
+      data-number={number}
+      data-title={articleTitle}
+      data-slug={articleSlug}
+      data-category={category}
+      novalidate
+    >
+      <label>الاسم<input name="name" autocomplete="name" required maxlength="60" /></label>
+      <label>رقم الجوال<input name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="05XXXXXXXX" dir="ltr" required /></label>
+      <label>المدينة
+        <select name="city" required>
+          {Object.entries(cityMeta).map(([key, label]) => <option value={key} selected={key === (city ?? "riyadh")}>{label}</option>)}
+        </select>
+      </label>
+      <label>الحي<input name="district" maxlength="60" required /></label>
+      <p class="lead-error" data-lead-error role="alert" hidden></p>
+      <button class="button" type="submit">أرسل الطلب عبر واتساب</button>
+    </form>
+    <p class="lead-note">نشارك بياناتك مع فني معتمد في مدينتك فقط لترتيب الزيارة، ولا نستخدمها لأي غرض آخر.</p>
+  </section>
+)}
+
+<script>
+  type DL = Record<string, unknown>[];
+  const w = window as unknown as { dataLayer: DL };
+  w.dataLayer = w.dataLayer || [];
+  const normalizePhone = (v: string) => {
+    const d = v.replace(/[٠-٩]/g, (c) => String(c.charCodeAt(0) - 0x0660)).replace(/\D/g, "");
+    if (/^05\d{8}$/.test(d)) return d;
+    if (/^9665\d{8}$/.test(d)) return `0${d.slice(3)}`;
+    if (/^5\d{8}$/.test(d)) return `0${d}`;
+    return "";
+  };
+  document.querySelectorAll<HTMLFormElement>("[data-lead-form]").forEach((form) => {
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const f = new FormData(form);
+      const name = String(f.get("name") ?? "").trim();
+      const phone = normalizePhone(String(f.get("phone") ?? ""));
+      const citySelect = form.elements.namedItem("city") as HTMLSelectElement;
+      const cityLabel = citySelect.selectedOptions[0]?.text ?? "";
+      const district = String(f.get("district") ?? "").trim();
+      const error = form.querySelector<HTMLElement>("[data-lead-error]")!;
+      if (!name || !district || !phone) {
+        error.textContent = !phone ? "اكتب رقم جوال سعودي صحيح يبدأ بـ 05." : "فضلًا أكمل الاسم والحي.";
+        error.hidden = false;
+        return;
+      }
+      error.hidden = true;
+      const { number, title, slug, category } = form.dataset;
+      w.dataLayer.push({
+        event: "technician_lead",
+        lead_city: citySelect.value,
+        lead_district: district,
+        article_slug: slug,
+        article_category: category,
+      });
+      const msg = `السلام عليكم، قرأت مقال «${title}» ومحتاج فني دش في ${cityLabel} - حي ${district}.\nالاسم: ${name}\nالجوال: ${phone}`;
+      window.open(`https://wa.me/${number}?text=${encodeURIComponent(msg)}`, "_blank", "noopener");
+    });
+  });
+</script>

@@ -1,0 +1,30 @@
+---
+import { monetization } from "@/site.config";
+const { gtmId, gscVerification, adsenseClient, adsenseEnabled } = monetization;
+---
+{gscVerification && <meta name="google-site-verification" content={gscVerification} />}
+<script is:inline>window.dataLayer = window.dataLayer || [];</script>
+{gtmId && (
+  <script is:inline define:vars={{ gtmId }}>
+    (function (w, d, s, l, i) {
+      w[l].push({ "gtm.start": Date.now(), event: "gtm.js" });
+      var f = d.getElementsByTagName(s)[0], j = d.createElement(s);
+      j.async = true;
+      j.src = "https://www.googletagmanager.com/gtm.js?id=" + i;
+      f.parentNode.insertBefore(j, f);
+    })(window, document, "script", "dataLayer", gtmId);
+  </script>
+)}
+{adsenseEnabled && adsenseClient && (
+  <script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`} crossorigin="anonymous"></script>
+)}
+<script>
+  // تتبع موحّد: أي عنصر يحمل data-track يرسل حدثًا إلى dataLayer عند الضغط.
+  document.addEventListener("click", (e) => {
+    const el = (e.target as HTMLElement | null)?.closest<HTMLElement>("[data-track]");
+    if (!el) return;
+    const { track, ...rest } = el.dataset;
+    const w = window as unknown as { dataLayer: Record<string, unknown>[] };
+    w.dataLayer.push({ event: track, link_url: (el as HTMLAnchorElement).href, page_path: location.pathname, ...rest });
+  });
+</script>

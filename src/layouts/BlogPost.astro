@@ -4,7 +4,10 @@ import Masthead from "@/components/blog/Masthead.astro";
 import TOC from "@/components/blog/TOC.astro";
 import BaseLayout from "./Base.astro";
 import { getAuthor } from "@/data/authors";
-import { siteConfig, categoryMeta } from "@/site.config";
+import { siteConfig, categoryMeta, monetization } from "@/site.config";
+import AffiliateBox from "@/components/monetization/AffiliateBox.astro";
+import TechnicianCTA from "@/components/monetization/TechnicianCTA.astro";
+import AdSlot from "@/components/monetization/AdSlot.astro";
 interface Props { post: CollectionEntry<"post"> }
 const { post } = Astro.props;
 const { data } = post;
@@ -12,6 +15,7 @@ const { headings } = await render(post);
 const wordCount = (post.body ?? "").trim().split(/\s+/).filter(Boolean).length;
 const readingTime = `${Math.max(1, Math.ceil(wordCount / 180))} دقائق قراءة`;
 const author = getAuthor(data.authorSlug);
+const showLead = data.leadCta ?? monetization.leadCategories.includes(data.category);
 const articleDate = (data.updatedDate ?? data.publishDate).toISOString();
 const schema = {
   "@context": "https://schema.org",
@@ -34,6 +38,9 @@ const schema = {
     <div class="article-grid">
       {!!headings.length && <TOC headings={headings} />}
       <div class="article-content prose"><slot />
+        <AffiliateBox products={data.products} articleSlug={post.id} />
+        {showLead && <TechnicianCTA articleTitle={data.title} articleSlug={post.id} category={data.category} city={data.city} />}
+        <AdSlot slot={import.meta.env.PUBLIC_ADSENSE_SLOT_ARTICLE ?? ""} />
         {data.sources.length > 0 && <section class="sources-box"><h2>المصادر والمراجع</h2><ol>{data.sources.map((s) => <li><a href={s.url} rel="nofollow noreferrer" target="_blank">{s.title}</a></li>)}</ol></section>}
         <section class="correction-box"><h2>وجدت معلومة تحتاج تحديثًا؟</h2><p>أرسل لنا رابط الصفحة والمعلومة الصحيحة مع مصدرها، وسيتم توثيق المراجعة في سجل التصحيحات.</p><a class="button secondary" href="/contact/">إبلاغ فريق التحرير</a></section>
       </div>

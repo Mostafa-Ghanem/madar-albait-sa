@@ -82,6 +82,42 @@ content:
         fields:
           - { name: title, label: اسم المصدر, type: string }
           - { name: url, label: رابط المصدر, type: string }
+      - name: city
+        label: المدينة المستهدفة (لطلب الفني)
+        type: select
+        options:
+          values:
+            - { name: riyadh, label: الرياض }
+            - { name: jeddah, label: جدة }
+            - { name: makkah, label: مكة المكرمة }
+            - { name: madinah, label: المدينة المنورة }
+            - { name: dammam, label: الدمام }
+            - { name: khobar, label: الخبر }
+            - { name: qassim, label: القصيم }
+            - { name: abha, label: أبها وخميس مشيط }
+            - { name: tabuk, label: تبوك }
+            - { name: hail, label: حائل }
+            - { name: other, label: مدينة أخرى }
+      - { name: leadCta, label: إظهار طلب فني (يُترك فارغًا للافتراضي حسب القسم), type: boolean }
+      - name: products
+        label: منتجات مقترحة (حتى 3)
+        type: object
+        list: { max: 3 }
+        fields:
+          - { name: name, label: اسم المنتج, type: string }
+          - { name: note, label: لماذا نرشحه (سطر واحد), type: string }
+          - { name: url, label: رابط الأفلييت, type: string }
+          - name: store
+            label: المتجر
+            type: select
+            default: amazon
+            options:
+              values:
+                - { name: amazon, label: أمازون السعودية }
+                - { name: noon, label: نون }
+                - { name: jarir, label: جرير }
+                - { name: extra, label: إكسترا }
+                - { name: other, label: أخرى }
       - name: body
         label: نص المقال
         type: rich-text
